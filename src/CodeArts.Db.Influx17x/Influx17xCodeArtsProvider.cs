@@ -17,7 +17,8 @@ namespace CodeArts.Db
     {
         readonly ISQLCorrectSettings _settings;
         readonly ICustomVisitorList _visitors;
-        public Influx17xCodeArtsProvider(ISQLCorrectSettings settings, ICustomVisitorList visitors) : base(settings, visitors)
+        public Influx17xCodeArtsProvider(ISQLCorrectSettings settings, ICustomVisitorList visitors)
+            : base(settings, visitors)
         {
             _settings = settings;
             _visitors = visitors;
@@ -218,7 +219,7 @@ namespace CodeArts.Db
         protected virtual string GetSqlTemplate(string sql, out string tableName)
         {
             var match = Regex.Match(sql, " [fF][rR][oO][mM] \"(.*?)\" ");
-            var sqlTemplate = sql.Replace(match.Value, " FROM \"{0}_{1}\" ");
+            var sqlTemplate = sql.Replace(match.Value, " FROM \"{0}{1}\" ");
             tableName = match.Groups[1].Value;
 
             return sqlTemplate;
