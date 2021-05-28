@@ -9,7 +9,26 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeArts.Db.Influx17x", "sr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{E4AA2A06-64E2-4076-914B-74FAB4D5BEC0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleTester", "tests\SampleTester\SampleTester.csproj", "{FA789380-8BF4-467D-92C0-B283B930A5B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleTester", "tests\SampleTester\SampleTester.csproj", "{FA789380-8BF4-467D-92C0-B283B930A5B8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E79C6336-87C4-41BE-88A8-68BCAD3A6B74}"
+	ProjectSection(SolutionItems) = preProject
+		azure-pipelines.yml = azure-pipelines.yml
+		common.props = common.props
+		global.json = global.json
+		LICENSE = LICENSE
+		README.md = README.md
+		RELEASE_NOTES.md = RELEASE_NOTES.md
+		repository_info.props = repository_info.props
+		version.props = version.props
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nupkg", "nupkg", "{FF1C478C-4F8A-46D2-88EA-1A07EBA3CF83}"
+	ProjectSection(SolutionItems) = preProject
+		nupkg\common.ps1 = nupkg\common.ps1
+		nupkg\pack.ps1 = nupkg\pack.ps1
+		nupkg\push_packages.ps1 = nupkg\push_packages.ps1
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,6 +51,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{CD93AA0B-D824-4222-80A2-573F644942A6} = {E85D9D04-2AF4-472B-BB56-31F552B96473}
 		{FA789380-8BF4-467D-92C0-B283B930A5B8} = {E4AA2A06-64E2-4076-914B-74FAB4D5BEC0}
+		{FF1C478C-4F8A-46D2-88EA-1A07EBA3CF83} = {E79C6336-87C4-41BE-88A8-68BCAD3A6B74}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C5B0B80F-790F-44FA-8E44-CA7121CA654D}

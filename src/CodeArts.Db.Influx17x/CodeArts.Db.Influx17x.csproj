@@ -1,8 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="..\..\common.props" />
+  <Import Project="..\..\version.props" />
+  <Import Project="..\..\repository_info.props" />
+
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>CodeArts.Db</RootNamespace>
+
+    <PackageId>Riven.CodeArts.Db.Influx17x</PackageId>
+    <Description>Riven.CodeArts.Db.Influx17x</Description>
+    <AssemblyName>Riven.CodeArts.Db.Influx17x</AssemblyName>
+
+    <PackageTags>riven;codearts;influxdb;influx;linq;</PackageTags>
+    
   </PropertyGroup>
 
   <ItemGroup>
