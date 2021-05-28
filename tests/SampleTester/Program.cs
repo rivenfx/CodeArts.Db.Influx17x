@@ -54,6 +54,7 @@ namespace SampleTester
                 SensorId = "none",
                 Deployment = "point none",
                 Value = 1,
+                Label = "tmp",
                 Timestamp = DateTime.Now
             }).ConfigureAwait(false)
                .GetAwaiter()
@@ -73,9 +74,10 @@ namespace SampleTester
             {
                 var sensor = new MySensor()
                 {
-                    SensorId = i.ToString(),
-                    Deployment = $"point {i}",
+                    SensorId = (i + 100).ToString(),
+                    Deployment = $"point {(i + 100)}",
                     Value = i,
+                    Label = "tmp",
                     Timestamp = start1
                 };
 
@@ -143,6 +145,8 @@ namespace SampleTester
 
         [Naming("data")]
         public float Value { get; set; }
+
+        public string Label { get; set; }
 
         [Naming("time")]
         [Influx17xColumn(Influx17xColumnType.Timestamp)]
