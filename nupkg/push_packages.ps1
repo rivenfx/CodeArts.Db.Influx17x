@@ -6,6 +6,8 @@ if ([System.String]::IsNullOrWhiteSpace($apiKey))
     $apiKey = $env:NUGET_KEY
 }
 
+Write-Host ("apikey  " + $apiKey)
+
 # 获取版本
 [xml]$versionPropsXml = Get-Content (Join-Path $rootFolder "version.props")
 $version = $versionPropsXml.Project.PropertyGroup.Version
