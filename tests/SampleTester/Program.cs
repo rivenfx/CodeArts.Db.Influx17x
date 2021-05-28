@@ -41,7 +41,8 @@ namespace SampleTester
             // 新增数据
             InsertData(influxDbClient);
             // 查询数据
-            QueryData(influxDbClient);
+            QueryData1(influxDbClient);
+            QueryData2(influxDbClient);
 
         }
 
@@ -84,7 +85,7 @@ namespace SampleTester
             }
 
             writeRes = client.BatchInsertAsync(
-                dataList, 
+                dataList,
                 timestampAddToTableName: true
                 )
                 .ConfigureAwait(false)
@@ -92,10 +93,27 @@ namespace SampleTester
                 .GetResult();
         }
 
-        static void QueryData(SampleInfluxClient client)
+        static void QueryData1(SampleInfluxClient client)
         {
             var query = Influx17xHelper
-                //.CreateDeaultQuery<MySensor>()
+                .CreateDeaultQuery<MySensor>()
+                //.CreateDeaultQuery<MySensor>(DateTime.Parse("2021-01-01"))
+                .Where(o => o.Value > -1)
+                //.Skip(0)
+                //.Take(10)
+                ;
+
+
+            // 获取结果
+            var res = query.ToList();
+
+            // 打印sql
+            Console.WriteLine(query.ToString());
+        }
+
+        static void QueryData2(SampleInfluxClient client)
+        {
+            var query = Influx17xHelper
                 .CreateDeaultQuery<MySensor>(DateTime.Parse("2021-01-01"))
                 .Where(o => o.Value > -1)
                 //.Skip(0)
