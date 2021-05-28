@@ -9,14 +9,17 @@ using System.Reflection;
 namespace CodeArts.Db
 {
     /// <summary>
-    /// influx17 的实体转换器
+    /// influx1.x 基本的映射器
     /// </summary>
     public class Influx17xEntityMaper
     {
-        static string DateTimeTypeStr = typeof(DateTime).FullName;
+        protected static string DateTimeTypeStr = typeof(DateTime).FullName;
 
-        private IDictionary<string, string> TABLE_CACHE = new ConcurrentDictionary<string, string>();
-        private IDictionary<string, Influx17xColumnInfo[]> PROP_CACHE = new ConcurrentDictionary<string, Influx17xColumnInfo[]>();
+        protected IDictionary<string, string> TABLE_CACHE = new ConcurrentDictionary<string, string>();
+        protected IDictionary<string, Influx17xColumnInfo[]> PROP_CACHE = new ConcurrentDictionary<string, Influx17xColumnInfo[]>();
+
+        public static Influx17xEntityMaper BasicInstance { get; } = new Influx17xEntityMaper();
+        public static Influx17xTimestampEntityMaper TimestampInstance { get; } = new Influx17xTimestampEntityMaper();
 
 
         /// <summary>
@@ -25,12 +28,12 @@ namespace CodeArts.Db
         /// <typeparam name="T"></typeparam>
         /// <param name="entitys"></param>
         /// <returns></returns>
-        public virtual IEnumerable<Point> ToPoint<T>(IEnumerable<T> entitys)
+        public virtual IEnumerable<Point> ToPoints<T>(IEnumerable<T> entitys)
             where T : class, new()
         {
             foreach (var entity in entitys)
             {
-                yield return ToPoint(entity);
+                yield return ToPoint<T>(entity);
             }
         }
 
@@ -53,7 +56,6 @@ namespace CodeArts.Db
             // 创建point
             point = new Point()
             {
-                Name = tableName,
                 Tags = new Dictionary<string, object>(),
                 Fields = new Dictionary<string, object>(),
             };
@@ -148,7 +150,22 @@ namespace CodeArts.Db
                 }
             }
 
+            // 表名称
+            point.Name = GetTableName(tableName, point);
+
             return point;
+        }
+
+
+        /// <summary>
+        /// 获取表名称
+        /// </summary>
+        /// <param name="originalTableName">原始表名</param>
+        /// <param name="point">数据信息</param>
+        /// <returns>新表名</returns>
+        public virtual string GetTableName(string originalTableName, Point point)
+        {
+            return originalTableName;
         }
 
         /// <summary>
@@ -233,6 +250,23 @@ namespace CodeArts.Db
                 })
                 .Where(propertyInfo => propertyInfo.ColumnName != null)
                 .ToArray();
+        }
+
+    }
+
+    /// <summary>
+    /// influx1.x 根据时间来创建表名的映射器
+    /// </summary>
+    public class Influx17xTimestampEntityMaper : Influx17xEntityMaper
+    {
+        public override string GetTableName(string originalTableName, Point point)
+        {
+            if (point.Timestamp.HasValue)
+            {
+                return $"{originalTableName}{point.Timestamp.Value.ToString("yyyyMM")}";
+            }
+
+            return base.GetTableName(originalTableName, point);
         }
     }
 }

@@ -27,12 +27,17 @@ namespace CodeArts.Db
         /// 密码
         /// </summary>
         string Password { get; }
+
+        /// <summary>
+        /// 实体测点转换器
+        /// </summary>
+        Influx17xEntityMaper Mapper { get; }
     }
 
 
     public class InfluxOptions : IInfluxOptions
     {
-        public InfluxOptions(string server, string databaseName, string userName = "", string password = "")
+        public InfluxOptions(string server, string databaseName, string userName = "", string password = "", Influx17xEntityMaper mapper = null)
         {
             Server = server;
             DatabaseName = databaseName;
@@ -44,12 +49,14 @@ namespace CodeArts.Db
         public string DatabaseName { get; }
         public string UserName { get; }
         public string Password { get; }
+
+        public Influx17xEntityMaper Mapper { get; }
     }
 
 
     public static class IInfluxOptionsExtenstions
     {
-        public static IInfluxDbClient CreateInfluxClient(this IInfluxOptions options, HttpClient httpClient = null)
+        public static SampleInfluxClient CreateSampleInfluxClient(this IInfluxOptions options, HttpClient httpClient = null, Influx17xEntityMaper mapper = null)
         {
             return new SampleInfluxClient(
                 options.Server,
@@ -57,7 +64,8 @@ namespace CodeArts.Db
                 options.UserName,
                 options.Password,
                 influxVersion: InfluxDbVersion.v_1_3,
-                httpClient: httpClient ?? new HttpClient()
+                httpClient: httpClient ?? new HttpClient(),
+                mapper: mapper
                 );
         }
     }
