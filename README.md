@@ -11,7 +11,7 @@ Please note: once the use of the open source projects as well as the reference f
 
 ## Build Status
 
-[![Build Status](https://dev.azure.com/rivenfx/RivenFx/_apis/build/status/rivenfx.CodeArts.Db.Influx17x?branchName=master)](https://dev.azure.com/rivenfx/RivenFx/_build/latest?definitionId=4&branchName=master)
+[![Build Status](https://dev.azure.com/rivenfx/RivenFx/_apis/build/status/rivenfx.CodeArts.Db.Influx17x?branchName=master)](https://dev.azure.com/rivenfx/RivenFx/_build/latest?definitionId=8&branchName=master)
 
 ## Nuget Packages
 
