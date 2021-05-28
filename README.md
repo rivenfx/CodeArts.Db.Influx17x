@@ -1,5 +1,5 @@
 # Riven.CodeArts.Db.Influx17x
-`Riven.CodeArts.Db.Influx17x` Featuring simple LinQ lookup and write under the Influx 1.x version as CodeArts.
+LINQ queries are provided for influxdb version 1.7+
 
 
 ## LICENSES
