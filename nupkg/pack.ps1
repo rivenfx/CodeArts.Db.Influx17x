@@ -1,9 +1,6 @@
 # 执行公用脚本
 . ".\common.ps1"
 
-# 解决方案路径
-$slnPath = Join-Path $packFolder "../"
-$srcPath = Join-Path $slnPath "src"
 
 # 创建文件夹
 if(!(Test-Path $packOutputFolder)){
@@ -26,8 +23,18 @@ foreach($project in $projects) {
     & dotnet msbuild /p:Configuration=Release /p:SourceLinkCreate=true
     & dotnet msbuild /t:pack /p:Configuration=Release /p:SourceLinkCreate=true
 
+    # 获取包名称
+    $packageId = $project
+    Try{
+        [xml]$csprojXml = Get-Content ("./"+$project+".csproj")
+        $packageId = $csprojXml.Project.PropertyGroup.PackageId
+    }
+    Catch {
+        Write-Host ('get package id error in ' + $project + '.csproj, So use package id: '+ $packageId)
+    }
+
     # 复制 nuget 包
-    $projectPackPath = Join-Path $projectFolder ("/bin/Release/" + $project + ".*.nupkg")
+    $projectPackPath = Join-Path $projectFolder ("/bin/Release/" + $packageId + ".*.nupkg")
     Move-Item $projectPackPath $packOutputFolder
 
 }
