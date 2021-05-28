@@ -45,8 +45,9 @@ namespace CodeArts.Db
         /// <param name="retentionPolicy">策略, 默认 autogen</param>
         /// <param name="precision">精度,默认 ms</param>
         /// <param name="mapper">实体转Point转换器</param>
+        /// <param name="timestampAddToTableName">timestamp做表名</param>
         /// <returns></returns>
-        public Task<IInfluxDataApiResponse> InsertAsync<T>(T data, string retentionPolicy = "autogen", string precision = "ms")
+        public Task<IInfluxDataApiResponse> InsertAsync<T>(T data, string retentionPolicy = "autogen", string precision = "ms", bool timestampAddToTableName = false)
             where T : class, new()
         {
             if (data is Point point)
@@ -65,7 +66,7 @@ namespace CodeArts.Db
             }
 
             return this.Client.WriteAsync(
-                      this.Mapper.ToPoint<T>(data),
+                      this.Mapper.ToPoint<T>(data, timestampAddToTableName),
                       this.DatabaseName,
                       retentionPolicy,
                       precision
@@ -80,8 +81,9 @@ namespace CodeArts.Db
         /// <param name="datas">数据</param>
         /// <param name="retentionPolicy">策略, 默认 autogen</param>
         /// <param name="precision">精度,默认 ms</param>
+        /// <param name="timestampAddToTableName">timestamp做表名</param>
         /// <returns></returns>
-        public virtual Task<IInfluxDataApiResponse> BatchInsertAsync<T>(IEnumerable<T> datas, string retentionPolicy = "autogen", string precision = "ms")
+        public virtual Task<IInfluxDataApiResponse> BatchInsertAsync<T>(IEnumerable<T> datas, string retentionPolicy = "autogen", string precision = "ms", bool timestampAddToTableName = false)
              where T : class, new()
         {
             if (datas is IEnumerable<Point> points)
@@ -94,11 +96,8 @@ namespace CodeArts.Db
                       );
             }
 
-            points = this.Mapper.ToPoints<T>(datas);
-            var tmp = points.ToList();
-
             return this.Client.WriteAsync(
-                      tmp,
+                      this.Mapper.ToPoints<T>(datas, timestampAddToTableName),
                       this.DatabaseName,
                       retentionPolicy,
                       precision

@@ -19,25 +19,31 @@ namespace CodeArts.Db
         protected IDictionary<string, Influx17xColumnInfo[]> PROP_CACHE = new ConcurrentDictionary<string, Influx17xColumnInfo[]>();
 
         public static Influx17xEntityMaper BasicInstance { get; } = new Influx17xEntityMaper();
-        public static Influx17xTimestampEntityMaper TimestampInstance { get; } = new Influx17xTimestampEntityMaper();
-
 
         /// <summary>
-        /// 类型转
+        /// 转Point
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="entitys"></param>
+        /// <param name="timestampAddToTableName">时间追加到表名</param>
         /// <returns></returns>
-        public virtual IEnumerable<Point> ToPoints<T>(IEnumerable<T> entitys)
+        public virtual IEnumerable<Point> ToPoints<T>(IEnumerable<T> entitys, bool timestampAddToTableName = false)
             where T : class, new()
         {
             foreach (var entity in entitys)
             {
-                yield return ToPoint<T>(entity);
+                yield return ToPoint<T>(entity, timestampAddToTableName);
             }
         }
 
-        public virtual Point ToPoint<T>(T entity)
+        /// <summary>
+        /// 转Point
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entity"></param>
+        /// <param name="timestampAddToTableName">时间追加到表名</param>
+        /// <returns></returns>
+        public virtual Point ToPoint<T>(T entity, bool timestampAddToTableName = false)
              where T : class, new()
         {
             if (entity is Point point)
@@ -150,8 +156,17 @@ namespace CodeArts.Db
                 }
             }
 
+            // 如果没有
+            if (!point.Timestamp.HasValue)
+            {
+                point.Timestamp = DateTime.UtcNow;
+            }
             // 表名称
-            point.Name = GetTableName(tableName, point);
+            point.Name = GetTableName(
+                tableName,
+                point,
+                timestampAddToTableName
+                );
 
             return point;
         }
@@ -162,9 +177,15 @@ namespace CodeArts.Db
         /// </summary>
         /// <param name="originalTableName">原始表名</param>
         /// <param name="point">数据信息</param>
+        /// <param name="timestampAddToTableName">时间追加到表名</param>
         /// <returns>新表名</returns>
-        public virtual string GetTableName(string originalTableName, Point point)
+        public virtual string GetTableName(string originalTableName, Point point, bool timestampAddToTableName)
         {
+            if (timestampAddToTableName && point.Timestamp.HasValue)
+            {
+                return $"{originalTableName}{point.Timestamp.Value.ToString("yyyyMM")}";
+            }
+
             return originalTableName;
         }
 
@@ -252,21 +273,5 @@ namespace CodeArts.Db
                 .ToArray();
         }
 
-    }
-
-    /// <summary>
-    /// influx1.x 根据时间来创建表名的映射器
-    /// </summary>
-    public class Influx17xTimestampEntityMaper : Influx17xEntityMaper
-    {
-        public override string GetTableName(string originalTableName, Point point)
-        {
-            if (point.Timestamp.HasValue)
-            {
-                return $"{originalTableName}{point.Timestamp.Value.ToString("yyyyMM")}";
-            }
-
-            return base.GetTableName(originalTableName, point);
-        }
     }
 }
