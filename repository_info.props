@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/rivenfx/Modular</RepositoryUrl>
-    <PackageLicense>https://github.com/rivenfx/Modular/blob/master/LICENSE</PackageLicense>
+    <RepositoryUrl>https://github.com/rivenfx/CodeArts.Db.Influx17x</RepositoryUrl>
+    <PackageLicense>https://github.com/rivenfx/CodeArts.Db.Influx17x/blob/master/LICENSE</PackageLicense>
   </PropertyGroup>
     
 </Project>
