@@ -4,19 +4,21 @@ using CodeArts.Db.Lts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace CodeArts.Db
 {
     public static class Influx17xHelper
     {
+        public static bool InitializedCodeArts { get; private set; }
         public static Influx17xConnectionConfig ConnectionConfig { get; private set; }
 
         /// <summary>
         /// 初始化 Influx17xHelper
         /// </summary>
         /// <param name="connectionConfig"></param>
-        public static void Initialize(Influx17xConnectionConfig defaultConnectionConfig)
+        public static void InitializeDefaultConnectionConfig(Influx17xConnectionConfig defaultConnectionConfig)
         {
             if (ConnectionConfig != null)
             {
@@ -29,15 +31,74 @@ namespace CodeArts.Db
                     "输入参数不能为空"
                     );
             }
-
-
             ConnectionConfig = defaultConnectionConfig;
+        }
 
-            //
-            DbConnectionManager.RegisterAdapter(new Influx17xAdpter());
-            DbConnectionManager.RegisterProvider<Influx17xCodeArtsProvider>(
-                Influx17xAdpter.Name
+        /// <summary>
+        /// 初始化 Influx17xHelper
+        /// </summary>
+        public static void InitializeCodeArts()
+        {
+            InitializeCodeArts<Influx17xCodeArtsProvider>();
+        }
+
+        /// <summary>
+        /// 初始化 Influx17xHelper
+        /// </summary>
+        /// <typeparam name="TInflux17xCodeArtsProvider"></typeparam>
+        /// <param name="adpter"></param>
+        public static void InitializeCodeArts<TInflux17xCodeArtsProvider>(Influx17xAdpter adpter = null)
+            where TInflux17xCodeArtsProvider : Influx17xCodeArtsProvider
+        {
+            if (adpter == null)
+            {
+                adpter = new Influx17xAdpter();
+            }
+
+            InitializeCodeArts(
+                adpter,
+                typeof(Influx17xCodeArtsProvider)
                 );
+        }
+
+        /// <summary>
+        /// 初始化 Influx17xHelper
+        /// </summary>
+        /// <param name="defaultConnectionConfig">默认连接配置</param>
+        /// <param name="influx17xAdpter">sql生成适配器</param>
+        /// <param name="codeArtsProvider">执行器类型</param>
+        static void InitializeCodeArts(Influx17xAdpter influx17xAdpter, Type codeArtsProvider)
+        {
+            if (InitializedCodeArts)
+            {
+                return;
+            }
+
+            if (influx17xAdpter == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(influx17xAdpter),
+                    "输入参数不能为空"
+                    );
+            }
+
+            if (influx17xAdpter == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(codeArtsProvider),
+                    "输入参数不能为空"
+                    );
+            }
+
+            InitializedCodeArts = true;
+            DbConnectionManager.RegisterAdapter(influx17xAdpter);
+            var type = typeof(DbConnectionManager);
+            var method = type.GetRuntimeMethod(
+                "RegisterProvider",
+                new Type[] { typeof(string) }
+                );
+            method.MakeGenericMethod(codeArtsProvider)
+                .Invoke(type, new object[] { influx17xAdpter.ProviderName });
         }
 
 
