@@ -179,7 +179,7 @@ namespace CodeArts.Db
             // 表名称
             point.Name = GetTableName(
                 tableName,
-                point,
+                point.Timestamp,
                 tableExtensionName,
                 timestampAddToTableName
                 );
@@ -187,28 +187,45 @@ namespace CodeArts.Db
             return point;
         }
 
+        /// <summary>
+        /// 获取表名称
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="timestamp">数据时间</param>
+        /// <param name="tableExtensionName">表扩展名称</param>
+        /// <param name="timestampAddToTableName">时间追加到表名</param>
+        /// <returns>表名</returns>
+        public virtual string GetTableName<T>(DateTime? timestamp = null, string tableExtensionName = null, bool timestampAddToTableName = false)
+            where T : class, new()
+        {
+            var entityType = typeof(T);
+            this.CacheEntityClass(entityType);
+
+            var tableName = this.TABLE_CACHE[entityType.FullName];
+            return this.GetTableName(tableName, timestamp, tableExtensionName, timestampAddToTableName);
+        }
 
         /// <summary>
         /// 获取表名称
         /// </summary>
         /// <param name="originalTableName">原始表名</param>
-        /// <param name="point">数据信息</param>
+        /// <param name="timestamp">数据时间</param>
         /// <param name="tableExtensionName">表扩展名称</param>
         /// <param name="timestampAddToTableName">时间追加到表名</param>
-        /// <returns>新表名</returns>
-        public virtual string GetTableName(string originalTableName, Point point, string tableExtensionName, bool timestampAddToTableName)
+        /// <returns>表名</returns>
+        public string GetTableName(string originalTableName, DateTime? timestamp = null, string tableExtensionName = null, bool timestampAddToTableName = false)
         {
             // 使用时间戳
-            if (timestampAddToTableName && point.Timestamp.HasValue)
+            if (timestampAddToTableName && timestamp.HasValue)
             {
                 // 表名 = 原始名称_表扩展名
                 if (string.IsNullOrWhiteSpace(tableExtensionName))
                 {
-                    return $"{originalTableName}{point.Timestamp.Value.ToString("yyyyMM")}";
+                    return $"{originalTableName}{timestamp.Value.ToString("yyyyMM")}";
                 }
 
                 // 表名 = 原始名称_表扩展名yyyyMM
-                return $"{originalTableName}_{tableExtensionName}{point.Timestamp.Value.ToString("yyyyMM")}";
+                return $"{originalTableName}_{tableExtensionName}{timestamp.Value.ToString("yyyyMM")}";
             }
 
             // 表名 = 原始名称_表扩展名

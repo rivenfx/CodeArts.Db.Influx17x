@@ -111,7 +111,8 @@ namespace CodeArts.Db
         /// <param name="start"></param>
         /// <param name="end"></param>
         /// <returns></returns>
-        public static IQueryable<T> CreateQuery<T>(Influx17xConnectionConfig connectionConfig, string tableName, DateTime? start = null, DateTime? end = null)
+        public static IQueryable<T> CreateQuery<T>(Influx17xConnectionConfig connectionConfig, string tableName = null, DateTime? start = null, DateTime? end = null)
+            where T : class, new()
         {
             // 参数校验
             if (connectionConfig == null)
@@ -185,6 +186,7 @@ namespace CodeArts.Db
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public static IQueryable<T> CreateDeaultQuery<T>()
+            where T : class, new()
         {
             return CreateDeaultQuery<T>(null);
         }
@@ -196,6 +198,7 @@ namespace CodeArts.Db
         /// <param name="partion">分表时间</param>
         /// <returns></returns>
         public static IQueryable<T> CreateDeaultQuery<T>(DateTime? partion)
+            where T : class, new()
         {
             return CreateDeaultQuery<T>(partion, null);
         }
@@ -208,6 +211,7 @@ namespace CodeArts.Db
         /// <param name="partion">分表时间</param>
         /// <returns></returns>
         public static IQueryable<T> CreateDeaultQuery<T>(string tableName, DateTime? partion)
+            where T : class, new()
         {
             return CreateDeaultQuery<T>(tableName, partion, null);
         }
@@ -223,6 +227,7 @@ namespace CodeArts.Db
         /// <param name="end">分表结束时间</param>
         /// <returns>查询器</returns>
         static IQueryable<T> CreateDeaultQuery<T>(string tableName, DateTime? start, DateTime? end)
+            where T : class, new()
         {
             if (ConnectionConfig == null)
             {
@@ -245,6 +250,7 @@ namespace CodeArts.Db
         /// <param name="end">分表结束时间</param>
         /// <returns></returns>
         static IQueryable<T> CreateDeaultQuery<T>(DateTime? start, DateTime? end)
+            where T : class, new()
         {
             return CreateDeaultQuery<T>(null, start, end);
         }
