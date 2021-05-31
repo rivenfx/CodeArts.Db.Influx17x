@@ -1,4 +1,3 @@
-using CodeArts;
 using CodeArts.Db;
 using CodeArts.Db.Lts;
 
@@ -41,63 +40,45 @@ namespace SampleTester
             // 新增数据
             InsertData(influxDbClient);
             // 查询数据
-            QueryData1(influxDbClient);
-            QueryData2(influxDbClient);
+            QueryData(connectionConfig);
 
         }
 
 
-        static void InsertData(SampleInfluxClient client)
+        static void InsertData(SampleInfluxClient influxDbClient)
         {
-            var writeRes = client.InsertAsync(new MySensor()
+            var mySensor = new MySensor()
             {
-                SensorId = "none",
-                Value = 1,
-                Label = "tmp",
-                Timestamp = DateTime.Now
-            }).ConfigureAwait(false)
-               .GetAwaiter()
-               .GetResult();
+                SensorId = "1",
+                DataType = "number",
+                Label = "测试传感器",
+                Timestamp = DateTime.UtcNow,
+                Tmp = "临时字段",
+                Value = 1
+            };
 
-            var start1 = new DateTime(
-                           2021,
-                           01,
-                           01,
-                           01,
-                           01,
-                           01,
-                           DateTimeKind.Utc
-                           );
-            var dataList = new List<MySensor>();
-            for (int i = 0; i < 100; i++)
-            {
-                var sensor = new MySensor()
-                {
-                    SensorId = (i + 100).ToString(),
-                    Value = i,
-                    Label = "tmp",
-                    Timestamp = start1
-                };
-
-                dataList.Add(sensor);
-
-                start1 = start1.AddDays(1);
-            }
-
-            writeRes = client.InsertAsync(
-                dataList,
-                timestampAddToTableName: true
-                )
-                .ConfigureAwait(false)
-                .GetAwaiter()
-                .GetResult();
+            var writeRes = influxDbClient.InsertAsync(
+                   mySensor,
+                   timestampAddToTableName: true
+                   )
+                   .ConfigureAwait(false)
+                   .GetAwaiter()
+                   .GetResult();
         }
 
-        static void QueryData1(SampleInfluxClient client)
+        static void QueryData(Influx17xConnectionConfig connectionConfig)
         {
+            var portionDate = DateTime.UtcNow;
+            var extenstionTableName = "number";
+
+            var tableName = Influx17xEntityMaper.BasicInstance
+                .GetTableName<MySensor>(
+                    portionDate, 
+                    extenstionTableName, 
+                    true
+                );
             var query = Influx17xHelper
-                .CreateDeaultQuery<MySensor>()
-                //.CreateDeaultQuery<MySensor>(DateTime.Parse("2021-01-01"))
+                .CreateQuery<MySensor>(connectionConfig, tableName)
                 .Where(o => o.Value > -1)
                 //.Skip(0)
                 //.Take(10)
@@ -111,48 +92,6 @@ namespace SampleTester
             Console.WriteLine(query.ToString());
         }
 
-        static void QueryData2(SampleInfluxClient client)
-        {
-            var query = Influx17xHelper
-                .CreateQuery<MySensor>(null,null)
-                .Where(o => o.Value > -1)
-                //.Skip(0)
-                //.Take(10)
-                ;
-
-
-            // 获取结果
-            var res = query.ToList();
-
-            // 打印sql
-            Console.WriteLine(query.ToString());
-        }
-    }
-
-
-    [Naming("mysensor")]
-    public class MySensor
-    {
-        // [Influx17xColumn(Influx17xColumnType.Tag)] tag类型列
-        [Influx17xColumn(Influx17xColumnType.Tag)]
-        public string SensorId { get; set; }
-
-        // 时间戳列,必须标记为 [Naming("time")] 和 [Influx17xColumn(Influx17xColumnType.Timestamp)]
-        [Naming("time")]
-        [Influx17xColumn(Influx17xColumnType.Timestamp)]
-        public DateTime Timestamp { get; set; }
-
-        // 表扩展名称
-        [Influx17xColumn(Influx17xColumnType.TableExtensionName)]
-        public string DataType { get; set; }
-
-        // 忽略映射的列
-        [Ignore]
-        public string Tmp { get; set; }
-
-        public float Value { get; set; }
-
-        public string Label { get; set; }
     }
 }
 
