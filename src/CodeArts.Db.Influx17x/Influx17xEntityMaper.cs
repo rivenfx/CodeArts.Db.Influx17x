@@ -77,8 +77,6 @@ namespace CodeArts.Db
 
                 switch (prop.ColumnType)
                 {
-                    case Influx17xColumnType.Ignore: // 忽略的列
-                        continue;
                     case Influx17xColumnType.Tag:
                         {
                             if (value is string str)
@@ -242,6 +240,11 @@ namespace CodeArts.Db
                     {
                         info.ColumnType = columnType.Type;
                     }
+                    var ignoreAttr = property.GetCustomAttribute(typeof(IgnoreAttribute)) as IgnoreAttribute;
+                    if (ignoreAttr != null)
+                    {
+                        info.ColumnType = Influx17xColumnType.Ignore;
+                    }
 
                     // 时间戳处理
                     switch (info.ColumnType)
@@ -271,7 +274,11 @@ namespace CodeArts.Db
                     return info;
 
                 })
-                .Where(propertyInfo => propertyInfo.ColumnName != null)
+                .Where(propertyInfo =>
+                {
+                    return propertyInfo.ColumnName != null
+                    && propertyInfo.ColumnType != Influx17xColumnType.Ignore;
+                })
                 .ToArray();
         }
 
