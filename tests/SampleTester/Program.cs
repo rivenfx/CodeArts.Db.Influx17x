@@ -84,7 +84,7 @@ namespace SampleTester
                 start1 = start1.AddDays(1);
             }
 
-            writeRes = client.BatchInsertAsync(
+            writeRes = client.InsertAsync(
                 dataList,
                 timestampAddToTableName: true
                 )
@@ -114,7 +114,7 @@ namespace SampleTester
         static void QueryData2(SampleInfluxClient client)
         {
             var query = Influx17xHelper
-                .CreateDeaultQuery<MySensor>(DateTime.Parse("2021-01-01"))
+                .CreateQuery<MySensor>(null,null)
                 .Where(o => o.Value > -1)
                 //.Skip(0)
                 //.Take(10)
@@ -144,7 +144,7 @@ namespace SampleTester
 
         // 表扩展名称
         [Influx17xColumn(Influx17xColumnType.TableExtensionName)]
-        public int DataType { get; set; }
+        public string DataType { get; set; }
 
         // 忽略映射的列
         [Ignore]

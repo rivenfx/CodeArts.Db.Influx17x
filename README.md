@@ -21,9 +21,102 @@ Please note: once the use of the open source projects as well as the reference f
 
 
 ## Quick start
-> TODO
+1. Install Nuget Package `Riven.CodeArts.Db.Influx17x`
+
+2. using namespaces
+```c#
+using System;
+using System.Linq;
+using System.Collections.Generic;
+using CodeArts;
+using CodeArts.Db;
+```
+
+3. Initialize
+```c#
+// 连接参数
+var influxOptions = new InfluxOptions(
+                    "http://192.168.1.116:8086", // influx server
+                    "test2", // database name
+                    userName: string.Empty, // username
+                    password: string.Empty // password
+              );
+
+var influxDbClient = influxOptions.CreateSampleInfluxClient();
+var connectionConfig = new Influx17xConnectionConfig(
+                   influxDbClient
+);
+
+// 初始化 CodeArts
+CodeArtsHelper.InitializeBasic();
+
+// 初始化 CodeArts.Db.Influx17x
+Influx17xHelper.InitializeCodeArts();
+Influx17xHelper.InitializeDefaultConnectionConfig(connectionConfig);
+
+```
+
+4. Define entity types
+```c#
+
+    public class MySensor
+    {
+        // tag column, require [Influx17xColumn(Influx17xColumnType.Tag)] 
+        [Influx17xColumn(Influx17xColumnType.Tag)]
+        public string SensorId { get; set; }
+
+        // Timestamp column,require [Naming("time")] and  [Influx17xColumn(Influx17xColumnType.Timestamp)]
+        // Only one column is allowed
+        [Naming("time")]
+        [Influx17xColumn(Influx17xColumnType.Timestamp)]
+        public DateTime Timestamp { get; set; }
+
+        // table extension name column,require [Influx17xColumn(Influx17xColumnType.TableExtensionName)]
+        // Only one column is allowed
+        [Influx17xColumn(Influx17xColumnType.TableExtensionName)]
+        public int DataType { get; set; }
+
+        // Ignore mapping columns [Ignore]
+        [Ignore]
+        public string Tmp { get; set; }
+
+        public float Value { get; set; }
+
+        public string Label { get; set; }
+    }
+```
+
+5. Write datas
+```c#
+var data=new MySensor();
+var writeRes = influxDbClient.InsertAsync(
+                data,
+                timestampAddToTableName: true // tableName true: MySensor202001 false: MySensor
+                )
+                .ConfigureAwait(false)
+                .GetAwaiter()
+                .GetResult();
+
+var dataList = new List<MySensor>();        
+writeRes = influxDbClient.InsertAsync(
+                dataList,
+                timestampAddToTableName: false // tableName true: MySensor202001 false: MySensor
+                )
+                .ConfigureAwait(false)
+                .GetAwaiter()
+                .GetResult();                
+```
 
 
+6. Query datas
+```c#
+var query = Influx17xHelper.CreateQuery<MySensor>(connectionConfig,null)
+                .Where(o => o.Value > -1)
+                //.Skip(0)
+                //.Take(10)
+                ;
+var res = query.ToList();                
+```
 
 ## Demos
 
