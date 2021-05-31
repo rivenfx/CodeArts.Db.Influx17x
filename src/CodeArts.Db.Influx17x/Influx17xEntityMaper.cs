@@ -77,6 +77,8 @@ namespace CodeArts.Db
 
                 switch (prop.ColumnType)
                 {
+                    case Influx17xColumnType.Ignore: // 忽略的列
+                        continue;
                     case Influx17xColumnType.Tag:
                         {
                             if (value is string str)

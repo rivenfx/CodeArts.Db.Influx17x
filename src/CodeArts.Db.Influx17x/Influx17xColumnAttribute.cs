@@ -37,6 +37,10 @@ namespace CodeArts.Db
         /// <summary>
         /// 时间
         /// </summary>
-        Timestamp = 2
+        Timestamp = 2,
+        /// <summary>
+        /// 忽略
+        /// </summary>
+        Ignore = 3
     }
 }
