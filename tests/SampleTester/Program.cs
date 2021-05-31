@@ -52,7 +52,6 @@ namespace SampleTester
             var writeRes = client.InsertAsync(new MySensor()
             {
                 SensorId = "none",
-                Deployment = "point none",
                 Value = 1,
                 Label = "tmp",
                 Timestamp = DateTime.Now
@@ -75,7 +74,6 @@ namespace SampleTester
                 var sensor = new MySensor()
                 {
                     SensorId = (i + 100).ToString(),
-                    Deployment = $"point {(i + 100)}",
                     Value = i,
                     Label = "tmp",
                     Timestamp = start1
@@ -135,22 +133,26 @@ namespace SampleTester
     [Naming("mysensor")]
     public class MySensor
     {
-        [Naming("sensor_id")]
+        // [Influx17xColumn(Influx17xColumnType.Tag)] tag类型列
         [Influx17xColumn(Influx17xColumnType.Tag)]
         public string SensorId { get; set; }
 
-        [Naming("deployment")]
-        [Influx17xColumn(Influx17xColumnType.Tag)]
-        public string Deployment { get; set; }
-
-        [Naming("data")]
-        public float Value { get; set; }
-
-        public string Label { get; set; }
-
+        // 时间戳列,必须标记为 [Naming("time")] 和 [Influx17xColumn(Influx17xColumnType.Timestamp)]
         [Naming("time")]
         [Influx17xColumn(Influx17xColumnType.Timestamp)]
         public DateTime Timestamp { get; set; }
+
+        // 表扩展名称
+        [Influx17xColumn(Influx17xColumnType.TableExtensionName)]
+        public int DataType { get; set; }
+
+        // 忽略映射的列
+        [Ignore]
+        public string Tmp { get; set; }
+
+        public float Value { get; set; }
+
+        public string Label { get; set; }
     }
 }
 

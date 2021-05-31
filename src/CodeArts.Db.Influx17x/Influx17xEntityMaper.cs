@@ -88,6 +88,7 @@ namespace CodeArts.Db
                             {
                                 tableExtensionName = value.ToString().Trim();
                             }
+                            point.Fields[prop.ColumnName] = tableExtensionName;
                         }
                         break;
                     case Influx17xColumnType.Tag:
