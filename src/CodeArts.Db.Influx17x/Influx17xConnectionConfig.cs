@@ -4,7 +4,7 @@ namespace CodeArts.Db
 {
     public class Influx17xConnectionConfig : IConfigable<Influx17xConnectionConfig>, IReadOnlyConnectionConfig
     {
-        public Influx17xConnectionConfig(IInfluxDbClient influxClient)
+        public Influx17xConnectionConfig(SampleInfluxClient influxClient)
         {
             this.ProviderName = Influx17xAdpter.Name;
             this.InfluxClient = influxClient;
@@ -16,7 +16,7 @@ namespace CodeArts.Db
 
         public virtual string ConnectionString { get; set; }
 
-        public virtual IInfluxDbClient InfluxClient { get; protected set; }
+        public virtual SampleInfluxClient InfluxClient { get; protected set; }
 
         public void SaveChanges(Influx17xConnectionConfig changedValue)
         {

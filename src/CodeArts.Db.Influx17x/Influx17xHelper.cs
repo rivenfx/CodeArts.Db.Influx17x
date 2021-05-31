@@ -173,7 +173,7 @@ namespace CodeArts.Db
             var query = new Influx17xQueryable<T>(connectionConfig, start, end);
             if (!string.IsNullOrWhiteSpace(tableName))
             {
-                return query.From(o => tableName);
+                return query.From(o => tableName.ToLower());
             }
             return query;
         }
