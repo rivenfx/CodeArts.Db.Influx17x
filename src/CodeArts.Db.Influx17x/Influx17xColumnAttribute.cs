@@ -41,6 +41,10 @@ namespace CodeArts.Db
         /// <summary>
         /// 忽略
         /// </summary>
-        Ignore = 3
+        Ignore = 3,
+        /// <summary>
+        /// 表扩展名称
+        /// </summary>
+        TableExtensionName = 4
     }
 }

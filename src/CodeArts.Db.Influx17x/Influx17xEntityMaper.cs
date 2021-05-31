@@ -65,7 +65,8 @@ namespace CodeArts.Db
                 Tags = new Dictionary<string, object>(),
                 Fields = new Dictionary<string, object>(),
             };
-
+            // 表扩展名称
+            var tableExtensionName = string.Empty;
             // 构建point
             foreach (var prop in tableProps)
             {
@@ -77,6 +78,18 @@ namespace CodeArts.Db
 
                 switch (prop.ColumnType)
                 {
+                    case Influx17xColumnType.TableExtensionName:
+                        {
+                            if (value is string s)
+                            {
+                                tableExtensionName = s.Trim();
+                            }
+                            else
+                            {
+                                tableExtensionName = value.ToString().Trim();
+                            }
+                        }
+                        break;
                     case Influx17xColumnType.Tag:
                         {
                             if (value is string str)
@@ -156,15 +169,17 @@ namespace CodeArts.Db
                 }
             }
 
-            // 如果没有
+            // 如果没有时间戳
             if (!point.Timestamp.HasValue)
             {
                 point.Timestamp = DateTime.UtcNow;
             }
+
             // 表名称
             point.Name = GetTableName(
                 tableName,
                 point,
+                tableExtensionName,
                 timestampAddToTableName
                 );
 
@@ -177,15 +192,31 @@ namespace CodeArts.Db
         /// </summary>
         /// <param name="originalTableName">原始表名</param>
         /// <param name="point">数据信息</param>
+        /// <param name="tableExtensionName">表扩展名称</param>
         /// <param name="timestampAddToTableName">时间追加到表名</param>
         /// <returns>新表名</returns>
-        public virtual string GetTableName(string originalTableName, Point point, bool timestampAddToTableName)
+        public virtual string GetTableName(string originalTableName, Point point, string tableExtensionName, bool timestampAddToTableName)
         {
+            // 使用时间戳
             if (timestampAddToTableName && point.Timestamp.HasValue)
             {
-                return $"{originalTableName}{point.Timestamp.Value.ToString("yyyyMM")}";
+                // 表名 = 原始名称_表扩展名
+                if (string.IsNullOrWhiteSpace(tableExtensionName))
+                {
+                    return $"{originalTableName}{point.Timestamp.Value.ToString("yyyyMM")}";
+                }
+
+                // 表名 = 原始名称_表扩展名yyyyMM
+                return $"{originalTableName}_{tableExtensionName}{point.Timestamp.Value.ToString("yyyyMM")}";
             }
 
+            // 表名 = 原始名称_表扩展名
+            if (!string.IsNullOrWhiteSpace(tableExtensionName))
+            {
+                return $"{originalTableName}_{tableExtensionName}";
+            }
+
+            // 原始名称
             return originalTableName;
         }
 
@@ -195,8 +226,6 @@ namespace CodeArts.Db
         /// <param name="entityType"></param>
         public virtual void CacheEntityClass(Type entityType)
         {
-
-
             if (PROP_CACHE.ContainsKey(entityType.FullName))
             {
                 return;
@@ -215,6 +244,8 @@ namespace CodeArts.Db
 
             // 时间戳类型列计数
             var timestamp = 0;
+            // 表扩展名类型列计数
+            var tableExtensionName = 0;
             // 列处理
             PROP_CACHE[entityType.FullName] = entityType.GetProperties()
                 .Select(property =>
@@ -260,7 +291,7 @@ namespace CodeArts.Db
                                         );
                                 }
                                 // 只允许存在一个时间戳列
-                                if (timestamp > 1)
+                                if (timestamp == 1)
                                 {
                                     throw new ArgumentException(
                                         $"存在多个 Timestamp 列"
@@ -269,6 +300,15 @@ namespace CodeArts.Db
 
                                 timestamp++;
                             }
+                            break;
+                        case Influx17xColumnType.TableExtensionName:
+                            if (tableExtensionName == 1)
+                            {
+                                throw new ArgumentException(
+                                       $"存在多个 TableExtensionName 列"
+                                       );
+                            }
+                            tableExtensionName++;
                             break;
                     }
                     return info;
