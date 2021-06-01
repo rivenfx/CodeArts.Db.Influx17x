@@ -220,7 +220,7 @@ namespace CodeArts.Db
         /// <param name="tableExtenstionName">表扩展名称,会追加到基本表名后: basci_tableExtenstionName</param>
         /// <param name="timestampAddToTableName">时间追加到表名</param>
         /// <returns>表名</returns>
-        public string GetTableName(string originalTableName, DateTime? timestamp, string tableExtenstionName, bool timestampAddToTableName)
+        public virtual string GetTableName(string originalTableName, DateTime? timestamp, string tableExtenstionName, bool timestampAddToTableName)
         {
             // 使用时间戳
             if (timestampAddToTableName && timestamp.HasValue)
