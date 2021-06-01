@@ -25,14 +25,15 @@ namespace CodeArts.Db
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="entitys"></param>
+        /// <param name="tableExtenstionName">表扩展名称,会追加到基本表名后: basci_tableExtenstionName</param>
         /// <param name="timestampAddToTableName">时间追加到表名</param>
         /// <returns></returns>
-        public virtual IEnumerable<Point> ToPoints<T>(IEnumerable<T> entitys, bool timestampAddToTableName = false)
+        public virtual IEnumerable<Point> ToPoints<T>(IEnumerable<T> entitys, string tableExtenstionName, bool timestampAddToTableName = false)
             where T : class, new()
         {
             foreach (var entity in entitys)
             {
-                yield return ToPoint<T>(entity, timestampAddToTableName);
+                yield return ToPoint<T>(entity, tableExtenstionName, timestampAddToTableName);
             }
         }
 
@@ -41,9 +42,10 @@ namespace CodeArts.Db
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="entity"></param>
+        /// <param name="tableExtenstionName">表扩展名称,会追加到基本表名后: basci_tableExtenstionName</param>
         /// <param name="timestampAddToTableName">时间追加到表名</param>
         /// <returns></returns>
-        public virtual Point ToPoint<T>(T entity, bool timestampAddToTableName = false)
+        public virtual Point ToPoint<T>(T entity, string tableExtenstionName, bool timestampAddToTableName = false)
              where T : class, new()
         {
             if (entity is Point point)
@@ -65,8 +67,6 @@ namespace CodeArts.Db
                 Tags = new Dictionary<string, object>(),
                 Fields = new Dictionary<string, object>(),
             };
-            // 表扩展名称
-            var tableExtensionName = string.Empty;
             // 构建point
             foreach (var prop in tableProps)
             {
@@ -80,15 +80,22 @@ namespace CodeArts.Db
                 {
                     case Influx17xColumnType.TableExtensionName:
                         {
+                            // 扩展名不为空,跳过赋新值
+                            if (!string.IsNullOrWhiteSpace(tableExtenstionName))
+                            {
+                                continue;
+                            }
+
                             if (value is string s)
                             {
-                                tableExtensionName = s.Trim();
+                                tableExtenstionName = s.Trim();
                             }
                             else
                             {
-                                tableExtensionName = value.ToString().Trim();
+                                tableExtenstionName = value.ToString().Trim();
                             }
-                            point.Fields[prop.ColumnName] = tableExtensionName;
+                            point.Fields[prop.ColumnName]
+                                = tableExtenstionName;
                         }
                         break;
                     case Influx17xColumnType.Tag:
@@ -180,7 +187,7 @@ namespace CodeArts.Db
             point.Name = GetTableName(
                 tableName,
                 point.Timestamp,
-                tableExtensionName,
+                tableExtenstionName,
                 timestampAddToTableName
                 );
 
@@ -192,17 +199,17 @@ namespace CodeArts.Db
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="timestamp">数据时间</param>
-        /// <param name="tableExtensionName">表扩展名称</param>
+        /// <param name="tableExtenstionName">表扩展名称,会追加到基本表名后: basci_tableExtenstionName</param>
         /// <param name="timestampAddToTableName">时间追加到表名</param>
         /// <returns>表名</returns>
-        public virtual string GetTableName<T>(DateTime? timestamp = null, string tableExtensionName = null, bool timestampAddToTableName = false)
+        public virtual string GetTableName<T>(DateTime? timestamp, string tableExtenstionName, bool timestampAddToTableName = false)
             where T : class, new()
         {
             var entityType = typeof(T);
             this.CacheEntityClass(entityType);
 
             var tableName = this.TABLE_CACHE[entityType.FullName];
-            return this.GetTableName(tableName, timestamp, tableExtensionName, timestampAddToTableName);
+            return this.GetTableName(tableName, timestamp, tableExtenstionName, timestampAddToTableName);
         }
 
         /// <summary>
@@ -210,28 +217,28 @@ namespace CodeArts.Db
         /// </summary>
         /// <param name="originalTableName">原始表名</param>
         /// <param name="timestamp">数据时间</param>
-        /// <param name="tableExtensionName">表扩展名称</param>
+        /// <param name="tableExtenstionName">表扩展名称,会追加到基本表名后: basci_tableExtenstionName</param>
         /// <param name="timestampAddToTableName">时间追加到表名</param>
         /// <returns>表名</returns>
-        public string GetTableName(string originalTableName, DateTime? timestamp = null, string tableExtensionName = null, bool timestampAddToTableName = false)
+        public string GetTableName(string originalTableName, DateTime? timestamp, string tableExtenstionName, bool timestampAddToTableName)
         {
             // 使用时间戳
             if (timestampAddToTableName && timestamp.HasValue)
             {
                 // 表名 = 原始名称_表扩展名
-                if (string.IsNullOrWhiteSpace(tableExtensionName))
+                if (string.IsNullOrWhiteSpace(tableExtenstionName))
                 {
                     return $"{originalTableName}{timestamp.Value.ToString("yyyyMM")}";
                 }
 
                 // 表名 = 原始名称_表扩展名yyyyMM
-                return $"{originalTableName}_{tableExtensionName}{timestamp.Value.ToString("yyyyMM")}";
+                return $"{originalTableName}_{tableExtenstionName}{timestamp.Value.ToString("yyyyMM")}";
             }
 
             // 表名 = 原始名称_表扩展名
-            if (!string.IsNullOrWhiteSpace(tableExtensionName))
+            if (!string.IsNullOrWhiteSpace(tableExtenstionName))
             {
-                return $"{originalTableName}_{tableExtensionName}";
+                return $"{originalTableName}_{tableExtenstionName}";
             }
 
             // 原始名称

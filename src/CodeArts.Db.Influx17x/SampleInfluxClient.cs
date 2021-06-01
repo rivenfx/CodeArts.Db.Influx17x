@@ -40,14 +40,15 @@ namespace CodeArts.Db
         /// 新增数据
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="influxClient">客户端</param>
         /// <param name="data">数据</param>
         /// <param name="retentionPolicy">策略, 默认 autogen</param>
         /// <param name="precision">精度,默认 ms</param>
-        /// <param name="mapper">实体转Point转换器</param>
+        /// <param name="tableExtenstionName">表扩展名称,会追加到基本表名后: basci_tableExtenstionName</param>
         /// <param name="timestampAddToTableName">timestamp做表名</param>
         /// <returns></returns>
-        public Task<IInfluxDataApiResponse> InsertAsync<T>(T data, string retentionPolicy = "autogen", string precision = "ms", bool timestampAddToTableName = false)
+        public Task<IInfluxDataApiResponse> InsertAsync<T>(T data, string retentionPolicy = "autogen", string precision = "ms",
+            string tableExtenstionName = null,
+            bool timestampAddToTableName = false)
             where T : class, new()
         {
             if (data is Point point)
@@ -66,7 +67,7 @@ namespace CodeArts.Db
             }
 
             return this.Client.WriteAsync(
-                      this.Mapper.ToPoint<T>(data, timestampAddToTableName),
+                      this.Mapper.ToPoint<T>(data, tableExtenstionName, timestampAddToTableName),
                       this.DatabaseName,
                       retentionPolicy,
                       precision
@@ -77,13 +78,15 @@ namespace CodeArts.Db
         /// 新增数据-批量
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="influxClient">客户端</param>
         /// <param name="datas">数据</param>
         /// <param name="retentionPolicy">策略, 默认 autogen</param>
         /// <param name="precision">精度,默认 ms</param>
+        /// <param name="tableExtenstionName">表扩展名称,会追加到基本表名后: basci_tableExtenstionName</param>
         /// <param name="timestampAddToTableName">timestamp做表名</param>
         /// <returns></returns>
-        public virtual Task<IInfluxDataApiResponse> BatchInsertAsync<T>(IEnumerable<T> datas, string retentionPolicy = "autogen", string precision = "ms", bool timestampAddToTableName = false)
+        public virtual Task<IInfluxDataApiResponse> BatchInsertAsync<T>(IEnumerable<T> datas, string retentionPolicy = "autogen", string precision = "ms",
+            string tableExtenstionName = null,
+            bool timestampAddToTableName = false)
              where T : class, new()
         {
             if (datas is IEnumerable<Point> points)
@@ -97,7 +100,7 @@ namespace CodeArts.Db
             }
 
             return this.Client.WriteAsync(
-                      this.Mapper.ToPoints<T>(datas, timestampAddToTableName),
+                      this.Mapper.ToPoints<T>(datas, tableExtenstionName, timestampAddToTableName),
                       this.DatabaseName,
                       retentionPolicy,
                       precision
