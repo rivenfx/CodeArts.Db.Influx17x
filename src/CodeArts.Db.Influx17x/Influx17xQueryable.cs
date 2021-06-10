@@ -248,28 +248,7 @@ namespace CodeArts.Db
             {
                 visitor.Startup(this.Expression);
 
-                var sql = visitor.ToSQL();
-
-                var parameters = visitor.Parameters;
-
-                // 替换参数
-                var parameterVal = string.Empty;
-                foreach (var item in parameters)
-                {
-
-                    if (item.Value is DateTime dt)
-                    {
-                        parameterVal = dt.ToString("yyyy-MM-dd HH:mm:ss.fffffff");
-                    }
-                    else
-                    {
-                        parameterVal = item.Value.ToString();
-                    }
-
-                    sql = sql.Replace($"@{item.Key}@", parameterVal);
-                }
-
-                return sql;
+                return visitor.ToInflux17xSql();
             }
         }
 
