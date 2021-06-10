@@ -42,7 +42,7 @@ namespace CodeArts.Db
 
         protected override IDbConnection CreateDb(bool useCache = true)
         {
-            return null;
+            throw new System.NotImplementedException();
         }
     }
 
