@@ -1,3 +1,6 @@
+## Release v0.0.7
+* 修复生成sql的bug
+
 ## Release V0.0.6
 * 增加 MockDbConnection
 
