@@ -1,3 +1,6 @@
+## Release V0.0.6
+* 增加 MockDbConnection
+
 ## Release V0.0.5
 * 支持传入表扩展名,且优先级最高
 
