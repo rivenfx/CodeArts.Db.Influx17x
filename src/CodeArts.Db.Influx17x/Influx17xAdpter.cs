@@ -1,18 +1,13 @@
+
 using CodeArts.Db.Lts;
 
 using System;
+using System.Data;
 
 namespace CodeArts.Db
 {
-    public class Influx17xAdpter : IDbConnectionLtsAdapter
+    public class Influx17xAdpter : Influx17xDbConnectionFactory, IDbConnectionLtsAdapter
     {
-        public const string Name = "Influx17x";
-
-        /// <summary> 
-        /// 适配器名称。 
-        /// </summary>
-        public string ProviderName => Name;
-
         /// <summary>
         /// 矫正配置。
         /// </summary>
@@ -24,14 +19,5 @@ namespace CodeArts.Db
         /// 格式化。
         /// </summary>
         public ICustomVisitorList Visitors => visitters ?? (visitters = new CustomVisitorList());
-
-        public double ConnectionHeartbeat => throw new NotImplementedException();
-
-        public int MaxPoolSize => 0;
-
-        public System.Data.IDbConnection Create(string connectionString)
-        {
-            return null;
-        }
     }
 }

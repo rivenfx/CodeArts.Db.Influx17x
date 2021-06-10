@@ -6,8 +6,9 @@ namespace CodeArts.Db
     {
         public Influx17xConnectionConfig(SampleInfluxClient influxClient)
         {
-            this.ProviderName = Influx17xAdpter.Name;
+            this.ProviderName = Influx17xDbConnectionFactory.Name;
             this.InfluxClient = influxClient;
+            this.ConnectionString = influxClient.EndpointUri;
         }
 
         public virtual string Name { get; set; }

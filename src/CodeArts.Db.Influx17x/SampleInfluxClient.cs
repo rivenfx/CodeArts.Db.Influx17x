@@ -15,12 +15,15 @@ namespace CodeArts.Db
 {
     public class SampleInfluxClient : InfluxDbClient
     {
+        protected readonly string _endpointUri;
         protected readonly string _databaseName;
         protected readonly Influx17xEntityMaper _mapper;
+
 
         public SampleInfluxClient(string endpointUri, string databaseName, string username, string password, InfluxDbVersion influxVersion, QueryLocation queryLocation = QueryLocation.FormData, HttpClient httpClient = null, bool throwOnWarning = false, Influx17xEntityMaper mapper = null)
             : base(endpointUri, username, password, influxVersion, queryLocation, httpClient, throwOnWarning)
         {
+            this._endpointUri = endpointUri;
             this._databaseName = databaseName;
 
             if (true)
@@ -30,7 +33,7 @@ namespace CodeArts.Db
             _mapper = mapper ?? Influx17xEntityMaper.BasicInstance;
         }
 
-
+        public virtual string EndpointUri => this._endpointUri;
         public virtual string DatabaseName => this._databaseName;
         public virtual Influx17xEntityMaper Mapper => this._mapper;
 
