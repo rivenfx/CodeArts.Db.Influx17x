@@ -1,3 +1,6 @@
+## Release v0.0.8
+* 屏蔽获数据库的代码
+
 ## Release v0.0.7
 * 修复生成sql的bug
 
