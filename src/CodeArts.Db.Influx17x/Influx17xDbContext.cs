@@ -4,6 +4,7 @@ using InfluxData.Net.InfluxDb;
 
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq.Expressions;
 using System.Text;
 
@@ -37,6 +38,11 @@ namespace CodeArts.Db
         protected override CommandSql<T> CreateReadCommandSql<T>(Expression expression)
         {
             return base.CreateReadCommandSql<T>(expression);
+        }
+
+        protected override IDbConnection CreateDb(bool useCache = true)
+        {
+            return null;
         }
     }
 

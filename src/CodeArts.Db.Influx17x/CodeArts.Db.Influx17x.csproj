@@ -19,7 +19,6 @@
   <ItemGroup>
     <PackageReference Include="CodeArts.Casting" Version="7.1.2" />
     <PackageReference Include="CodeArts.Db.Lts" Version="7.1.2.6" />
-    <PackageReference Include="DbMocker" Version="1.18.0" />
     <PackageReference Include="InfluxData.Net" Version="8.0.1" />
   </ItemGroup>
 

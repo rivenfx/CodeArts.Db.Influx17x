@@ -1,5 +1,3 @@
-using Apps72.Dev.Data.DbMocker;
-
 using System.Data;
 
 namespace CodeArts.Db
@@ -16,7 +14,7 @@ namespace CodeArts.Db
 
         public IDbConnection Create(string connectionString)
         {
-            return new MockDbConnection();
+            return null;
         }
     }
 }
