@@ -1,4 +1,7 @@
 ## Release v0.0.8
+* 移除 `DbConnectionManager.RegisterProvider<CodeArtsProvider>();`
+
+## Release v0.0.8
 * 屏蔽获数据库的代码
 
 ## Release v0.0.7
