@@ -1,4 +1,4 @@
-## Release v0.0.8
+## Release v0.0.9
 * 移除 `DbConnectionManager.RegisterProvider<CodeArtsProvider>();`
 
 ## Release v0.0.8
