@@ -16,7 +16,6 @@ namespace CodeArts.Db
             {
                 return;
             }
-            DbConnectionManager.RegisterProvider<CodeArtsProvider>();
             RuntimeServPools.TryAddSingleton<IMapper, CastingMapper>();
         }
     }
