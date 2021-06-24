@@ -123,30 +123,6 @@ namespace CodeArts.Db
                     );
             }
 
-            // 如果开始为空,结束不为空,则将结束值给开始,并将结束置空
-            if (!start.HasValue && end.HasValue)
-            {
-                start = end;
-                end = null;
-            }
-
-            // 交换开始结束时间范围
-            if (start.HasValue
-                && end.HasValue)
-            {
-                if (start > end)
-                {
-                    var tmp = start;
-                    end = start;
-                    start = end;
-                }
-                // 开始和结束相等,结束置空
-                else if (start == end)
-                {
-                    end = null;
-                }
-            }
-
             #region 统一处理时间格式
 
             if (start.HasValue)
@@ -169,6 +145,39 @@ namespace CodeArts.Db
             }
 
             #endregion
+
+
+            // 如果开始为空,结束不为空,则将结束值给开始,并将结束置空
+            if (!start.HasValue && end.HasValue)
+            {
+                start = end;
+                end = null;
+            }
+
+            // 交换开始结束时间范围
+            if (start.HasValue
+                && end.HasValue)
+            {
+                if (start > end)
+                {
+                    var tmp = start;
+                    end = start;
+                    start = end;
+                }
+
+                // 开始和结束相等,结束置空
+                if (start == end)
+                {
+                    end = null;
+                }
+                else if (start.Value.Year == end.Value.Year
+                && start.Value.Month == end.Value.Month)
+                {
+                    end = null;
+                }
+            }
+
+
 
 
             var query = new Influx17xQueryable<T>(connectionConfig, start, end);
